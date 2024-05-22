@@ -1,12 +1,17 @@
 import { Request, Response } from "express";
 import { ProductServices } from "./Product.service";
+import { productValidationSchema } from "./Product.validation";
+import { ZodError } from "zod";
 
 const createProduct = async (req: Request, res: Response) => {
   try {
     const productData = req.body;
 
+    // zod parsed data
+    const zodParsedData = productValidationSchema.parse(productData);
+
     // store into DB - services function
-    const result = await ProductServices.createProductIntoDB(productData);
+    const result = await ProductServices.createProductIntoDB(zodParsedData);
 
     // send response
     res.status(200).json({
@@ -15,9 +20,10 @@ const createProduct = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
+    const zodError = error instanceof ZodError;
     res.status(500).json({
       success: false,
-      message: "Data not inserted.",
+      message: zodError ? error.issues[0].message : "Data not found",
       error: error,
     });
   }

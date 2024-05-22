@@ -14,6 +14,6 @@ export interface IProduct {
     price: number;
     category: string;
     tags: string[],
-    variants: [IVariant];
+    variants: IVariant[];
     inventory: IInventory;
 }
