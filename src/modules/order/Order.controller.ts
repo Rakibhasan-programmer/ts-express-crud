@@ -20,11 +20,17 @@ const createOrder = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    const zodError = error instanceof ZodError;
+    let message = "";
+    if(error instanceof ZodError){
+        message = error.issues[0].message;
+    }else if(error instanceof Error){
+        message = error?.message;
+    }else {
+        message = "Order not found";
+    }
     res.status(500).json({
       success: false,
-      message: zodError ? error.issues[0].message : "Data not found",
-      error: error,
+      message: message,
     });
   }
 };
